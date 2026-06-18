@@ -27,10 +27,7 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
   pointer-events:none;
 }
 
-.brand {
-  text-align:center;
-  margin-bottom:36px;
-}
+.brand { text-align:center; margin-bottom:36px; }
 .brand-name {
   font-family:'Bebas Neue',sans-serif;
   font-size:3rem;
@@ -94,7 +91,9 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
   display:block;
   margin-bottom:7px;
 }
-.finput, .ftextarea {
+.flabel .req { color:#D85A30; margin-left:3px; }
+
+.finput, .ftextarea, .fselect {
   width:100%;
   box-sizing:border-box;
   background:rgba(255,255,255,0.04);
@@ -106,16 +105,43 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
   font-family:'Inter',sans-serif;
   outline:none;
   transition:border-color 0.2s,background 0.2s;
-  margin-bottom:18px;
+  margin-bottom:4px;
 }
+.fselect {
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23EF9F27' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:36px;
+  cursor:pointer;
+}
+.fselect option { background:#2b1400; color:#fff; }
+.fselect option:disabled { color:rgba(255,255,255,0.3); }
 .finput::placeholder,.ftextarea::placeholder { color:rgba(255,255,255,0.18); }
-.finput:focus,.ftextarea:focus {
+.finput:focus,.ftextarea:focus,.fselect:focus {
   border-color:rgba(239,159,39,0.55);
   background:rgba(239,159,39,0.05);
 }
 .ftextarea { resize:vertical; min-height:110px; line-height:1.55; }
 
-.star-row { display:flex; gap:10px; margin-bottom:22px; }
+.field-wrap { margin-bottom:18px; }
+.err-msg {
+  font-size:0.72rem;
+  color:#e05050;
+  margin-top:5px;
+  display:none;
+  padding-left:2px;
+}
+.field-wrap.invalid .finput,
+.field-wrap.invalid .fselect,
+.field-wrap.invalid .ftextarea {
+  border-color:rgba(220,80,80,0.6);
+  background:rgba(220,80,80,0.04);
+}
+.field-wrap.invalid .err-msg { display:block; }
+
+.star-row { display:flex; gap:10px; margin-bottom:4px; }
 .sstar {
   font-size:1.9rem;
   cursor:pointer;
@@ -139,11 +165,11 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
   cursor:pointer;
   transition:background 0.2s,transform 0.15s;
   box-shadow:0 6px 0 #7a2510, 0 10px 24px rgba(0,0,0,0.45);
+  margin-top:6px;
 }
 .sbtn:hover { background:#c04a22; transform:translateY(-2px); }
 .sbtn:active { transform:translateY(3px); box-shadow:0 2px 0 #7a2510; }
-.sbtn.err { background:#A32D2D; }
-.sbtn.loading { background:#888; cursor:not-allowed; }
+.sbtn.loading { background:#666; cursor:not-allowed; transform:none !important; box-shadow:0 3px 0 #333; }
 
 .result-card {
   background:linear-gradient(145deg,#2b1400,#1e0d00);
@@ -192,6 +218,21 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
   font-size:2.1rem;color:#EF9F27;margin-bottom:8px;
 }
 .ok-screen p { color:rgba(255,255,255,0.45);font-size:0.88rem; }
+.ok-screen .new-btn {
+  display:inline-block;
+  margin-top:18px;
+  background:rgba(239,159,39,0.12);
+  border:1px solid rgba(239,159,39,0.3);
+  color:#EF9F27;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1rem;
+  letter-spacing:2px;
+  padding:10px 24px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.ok-screen .new-btn:hover { background:rgba(239,159,39,0.2); }
 </style>
 </head>
 <body>
@@ -211,20 +252,43 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
     </div>
 
     <div id="formBody">
-      <label class="flabel">Ismingiz</label>
-      <input class="finput" id="uname" placeholder="Masalan: Sardor" maxlength="40">
 
-      <label class="flabel">Baho bering</label>
-      <div class="star-row" id="starRow">
-        <button class="sstar" data-v="1">★</button>
-        <button class="sstar" data-v="2">★</button>
-        <button class="sstar" data-v="3">★</button>
-        <button class="sstar" data-v="4">★</button>
-        <button class="sstar" data-v="5">★</button>
+      <div class="field-wrap" id="fw-name">
+        <label class="flabel">Ismingiz <span class="req">*</span></label>
+        <input class="finput" id="uname" placeholder="Masalan: Sardor" maxlength="40" oninput="clearErr('fw-name')">
+        <div class="err-msg">Ism kiritish majburiy</div>
       </div>
 
-      <label class="flabel">Fikringiz</label>
-      <textarea class="ftextarea" id="utext" placeholder="Hot dog mazasi, xizmat yoki yetkazish haqida yozing..."></textarea>
+      <div class="field-wrap" id="fw-worker">
+        <label class="flabel">Xodimni tanlang <span class="req">*</span></label>
+        <select class="fselect" id="uworker" onchange="clearErr('fw-worker')">
+          <option value="" disabled selected>— Xodimni tanlang —</option>
+          <option value="Jasur">Jasur</option>
+          <option value="Nilufar">Nilufar</option>
+          <option value="Bobur">Bobur</option>
+          <option value="Malika">Malika</option>
+          <option value="Sherzod">Sherzod</option>
+          <option value="Umida">Umida</option>
+        </select>
+        <div class="err-msg">Xodimni tanlash majburiy</div>
+      </div>
+
+      <div class="field-wrap" id="fw-stars">
+        <label class="flabel">Baho bering</label>
+        <div class="star-row" id="starRow">
+          <button class="sstar" data-v="1">★</button>
+          <button class="sstar" data-v="2">★</button>
+          <button class="sstar" data-v="3">★</button>
+          <button class="sstar" data-v="4">★</button>
+          <button class="sstar" data-v="5">★</button>
+        </div>
+        <div class="err-msg">Baho berish majburiy</div>
+      </div>
+
+      <div class="field-wrap" id="fw-text">
+        <label class="flabel">Fikringiz</label>
+        <textarea class="ftextarea" id="utext" placeholder="Hot dog mazasi, xizmat yoki yetkazish haqida yozing..."></textarea>
+      </div>
 
       <button class="sbtn" id="sbtn" onclick="send()">🌭 YUBORISH</button>
     </div>
@@ -233,6 +297,7 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
       <span class="big">🎉</span>
       <h3>Rahmat!</h3>
       <p>Fikringiz qabul qilindi. Mr. Hotdog sizi hurmat qiladi!</p>
+      <button class="new-btn" onclick="resetForm()">+ YANGI FIKR</button>
     </div>
   </div>
 
@@ -254,6 +319,8 @@ const BOT_TOKEN = '8771936394:AAE8wQh-zfVmITs6SL4u3_aAOsYwRRMTUZs';
 const CHAT_ID   = '842230958';
 
 let rating = 0;
+let sending = false;
+
 const stars = document.querySelectorAll('.sstar');
 stars.forEach(s => {
   s.addEventListener('mouseenter', () => {
@@ -265,8 +332,13 @@ stars.forEach(s => {
   s.addEventListener('click', () => {
     rating = +s.dataset.v;
     stars.forEach(b => b.classList.toggle('lit', +b.dataset.v <= rating));
+    clearErr('fw-stars');
   });
 });
+
+function clearErr(id) {
+  document.getElementById(id).classList.remove('invalid');
+}
 
 function sendToTelegram(text) {
   return new Promise((resolve, reject) => {
@@ -281,55 +353,84 @@ function sendToTelegram(text) {
     script.src = url + '&callback=' + cbName;
     script.onerror = () => { delete window[cbName]; script.remove(); reject(new Error('Network error')); };
     document.head.appendChild(script);
-    setTimeout(() => { if(window[cbName]){ delete window[cbName]; script.remove(); reject(new Error('Timeout')); } }, 8000);
+    setTimeout(() => {
+      if (window[cbName]) { delete window[cbName]; script.remove(); reject(new Error('Timeout')); }
+    }, 10000);
   });
 }
 
+function resetForm() {
+  document.getElementById('uname').value    = '';
+  document.getElementById('uworker').value  = '';
+  document.getElementById('utext').value    = '';
+  rating = 0;
+  stars.forEach(b => b.classList.remove('lit'));
+  ['fw-name','fw-worker','fw-stars','fw-text'].forEach(id => {
+    document.getElementById(id).classList.remove('invalid');
+  });
+  document.getElementById('formBody').style.display  = '';
+  document.getElementById('okScreen').style.display  = 'none';
+  document.getElementById('resultCard').style.display = 'none';
+  const btn = document.getElementById('sbtn');
+  btn.classList.remove('loading');
+  btn.innerHTML = '🌭 YUBORISH';
+  sending = false;
+}
+
 async function send() {
-  const name = document.getElementById('uname').value.trim();
-  const text = document.getElementById('utext').value.trim();
-  const btn  = document.getElementById('sbtn');
+  if (sending) return;
 
-  if (!name || rating === 0 || !text) {
-    btn.classList.add('err');
-    btn.textContent = "⚠ Barcha maydonlarni to'ldiring!";
-    setTimeout(() => { btn.classList.remove('err'); btn.innerHTML = '🌭 YUBORISH'; }, 2200);
-    return;
-  }
+  const name   = document.getElementById('uname').value.trim();
+  const worker = document.getElementById('uworker').value;
+  const text   = document.getElementById('utext').value.trim();
+  const btn    = document.getElementById('sbtn');
 
+  // Validate required fields
+  let valid = true;
+  if (!name)   { document.getElementById('fw-name').classList.add('invalid');   valid = false; }
+  if (!worker) { document.getElementById('fw-worker').classList.add('invalid'); valid = false; }
+  if (!rating) { document.getElementById('fw-stars').classList.add('invalid');  valid = false; }
+  if (!valid) return;
+
+  sending = true;
   btn.classList.add('loading');
-  btn.textContent = '⏳ Yuborilmoqda...';
+  btn.innerHTML = '⏳ Yuborilmoqda...';
 
   const stars_str = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
   const now = new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' });
 
   const message =
     `🌭 <b>Mr. Hotdog — Yangi Sharh!</b>\n\n` +
-    `👤 <b>Ism:</b> ${name}\n` +
-    `${stars_str} <b>(${rating}/5)</b>\n\n` +
-    `💬 <b>Fikr:</b>\n${text}\n\n` +
-    `🕐 ${now}`;
+    `👤 <b>Mijoz:</b> ${name}\n` +
+    `👨‍🍳 <b>Xodim:</b> ${worker}\n` +
+    `${stars_str} <b>(${rating}/5)</b>\n` +
+    (text ? `\n💬 <b>Fikr:</b>\n${text}\n` : '') +
+    `\n🕐 ${now}`;
 
   try {
     await sendToTelegram(message);
-    document.getElementById('formBody').style.display = 'none';
-    document.getElementById('okScreen').style.display  = 'block';
 
+    // Show success
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('okScreen').style.display = 'block';
+
+    // Show result card
     const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     const rc = document.getElementById('resultCard');
     document.getElementById('rcStars').innerHTML = Array.from({length:5}, (_,i) =>
       `<span style="color:${i<rating?'#EF9F27':'rgba(239,159,39,0.2)'};font-size:1.1rem">★</span>`
     ).join('');
-    document.getElementById('rcText').textContent = '"' + text + '"';
+    document.getElementById('rcText').textContent = text ? `"${text}"` : `Xodim: ${worker}`;
     document.getElementById('rcAv').textContent   = initials;
     document.getElementById('rcName').textContent = name;
     rc.style.display = 'block';
 
   } catch (e) {
+    // On real error only — not triggered falsely
+    sending = false;
     btn.classList.remove('loading');
-    btn.classList.add('err');
-    btn.textContent = '⚠ Xatolik! Qayta urinib ko\'ring';
-    setTimeout(() => { btn.classList.remove('err'); btn.innerHTML = '🌭 YUBORISH'; }, 3000);
+    btn.innerHTML = '🌭 YUBORISH';
+    alert("Yuborishda xatolik yuz berdi. Internet aloqasini tekshiring.");
     console.error(e);
   }
 }
