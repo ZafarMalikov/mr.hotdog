@@ -143,6 +143,7 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
 .sbtn:hover { background:#c04a22; transform:translateY(-2px); }
 .sbtn:active { transform:translateY(3px); box-shadow:0 2px 0 #7a2510; }
 .sbtn.err { background:#A32D2D; }
+.sbtn.loading { background:#888; cursor:not-allowed; }
 
 .result-card {
   background:linear-gradient(145deg,#2b1400,#1e0d00);
@@ -249,6 +250,9 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
 </div>
 
 <script>
+const BOT_TOKEN = '8771936394:AAE8wQh-zfVmITs6SL4u3_aAOsYwRRMTUZs';
+const CHAT_ID   = '842230958';
+
 let rating = 0;
 const stars = document.querySelectorAll('.sstar');
 stars.forEach(s => {
@@ -264,10 +268,27 @@ stars.forEach(s => {
   });
 });
 
-function send() {
+function sendToTelegram(text) {
+  return new Promise((resolve, reject) => {
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&parse_mode=HTML&text=${encodeURIComponent(text)}`;
+    const script = document.createElement('script');
+    const cbName = 'tgcb_' + Date.now();
+    window[cbName] = function(data) {
+      delete window[cbName];
+      script.remove();
+      data && data.ok ? resolve(data) : reject(new Error(data && data.description || 'Xato'));
+    };
+    script.src = url + '&callback=' + cbName;
+    script.onerror = () => { delete window[cbName]; script.remove(); reject(new Error('Network error')); };
+    document.head.appendChild(script);
+    setTimeout(() => { if(window[cbName]){ delete window[cbName]; script.remove(); reject(new Error('Timeout')); } }, 8000);
+  });
+}
+
+async function send() {
   const name = document.getElementById('uname').value.trim();
   const text = document.getElementById('utext').value.trim();
-  const btn = document.getElementById('sbtn');
+  const btn  = document.getElementById('sbtn');
 
   if (!name || rating === 0 || !text) {
     btn.classList.add('err');
@@ -276,19 +297,41 @@ function send() {
     return;
   }
 
-  document.getElementById('formBody').style.display = 'none';
-  document.getElementById('okScreen').style.display = 'block';
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Yuborilmoqda...';
 
-  const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const stars_str = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
+  const now = new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' });
 
-  const rc = document.getElementById('resultCard');
-  document.getElementById('rcStars').innerHTML = Array.from({length:5},(_,i)=>
-    `<span style="color:${i<rating?'#EF9F27':'rgba(239,159,39,0.2)'};font-size:1.1rem">★</span>`
-  ).join('');
-  document.getElementById('rcText').textContent = '"' + text + '"';
-  document.getElementById('rcAv').textContent = initials;
-  document.getElementById('rcName').textContent = name;
-  rc.style.display = 'block';
+  const message =
+    `🌭 <b>Mr. Hotdog — Yangi Sharh!</b>\n\n` +
+    `👤 <b>Ism:</b> ${name}\n` +
+    `${stars_str} <b>(${rating}/5)</b>\n\n` +
+    `💬 <b>Fikr:</b>\n${text}\n\n` +
+    `🕐 ${now}`;
+
+  try {
+    await sendToTelegram(message);
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('okScreen').style.display  = 'block';
+
+    const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const rc = document.getElementById('resultCard');
+    document.getElementById('rcStars').innerHTML = Array.from({length:5}, (_,i) =>
+      `<span style="color:${i<rating?'#EF9F27':'rgba(239,159,39,0.2)'};font-size:1.1rem">★</span>`
+    ).join('');
+    document.getElementById('rcText').textContent = '"' + text + '"';
+    document.getElementById('rcAv').textContent   = initials;
+    document.getElementById('rcName').textContent = name;
+    rc.style.display = 'block';
+
+  } catch (e) {
+    btn.classList.remove('loading');
+    btn.classList.add('err');
+    btn.textContent = '⚠ Xatolik! Qayta urinib ko\'ring';
+    setTimeout(() => { btn.classList.remove('err'); btn.innerHTML = '🌭 YUBORISH'; }, 3000);
+    console.error(e);
+  }
 }
 </script>
 </body>
