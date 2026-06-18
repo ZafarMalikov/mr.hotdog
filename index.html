@@ -356,9 +356,8 @@ function resetForm() {
   ['fw-name','fw-worker','fw-stars','fw-text'].forEach(id => {
     document.getElementById(id).classList.remove('invalid');
   });
-  document.getElementById('formBody').style.display  = '';
+  document.getElementById('formBody').style.display = '';
   document.getElementById('okScreen').style.display  = 'none';
-  document.getElementById('resultCard').style.display = 'none';
   const btn = document.getElementById('sbtn');
   btn.classList.remove('loading');
   btn.innerHTML = '🌭 YUBORISH';
