@@ -254,9 +254,8 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
     <div id="formBody">
 
       <div class="field-wrap" id="fw-name">
-        <label class="flabel">Ismingiz <span class="req">*</span></label>
-        <input class="finput" id="uname" placeholder="Masalan: Sardor" maxlength="40" oninput="clearErr('fw-name')">
-        <div class="err-msg">Ism kiritish majburiy</div>
+        <label class="flabel">Ismingiz</label>
+        <input class="finput" id="uname" placeholder="Masalan: Sardor" maxlength="40">
       </div>
 
       <div class="field-wrap" id="fw-worker">
@@ -282,7 +281,6 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
           <button class="sstar" data-v="4">★</button>
           <button class="sstar" data-v="5">★</button>
         </div>
-        <div class="err-msg">Baho berish majburiy</div>
       </div>
 
       <div class="field-wrap" id="fw-text">
@@ -301,17 +299,7 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
     </div>
   </div>
 
-  <div class="result-card" id="resultCard">
-    <div class="rc-stars" id="rcStars"></div>
-    <div class="rc-text" id="rcText"></div>
-    <div class="rc-user">
-      <div class="rc-av" id="rcAv"></div>
-      <div>
-        <div class="rc-name" id="rcName"></div>
-        <div class="rc-badge">Yangi sharh</div>
-      </div>
-    </div>
-  </div>
+
 </div>
 
 <script>
@@ -385,53 +373,36 @@ async function send() {
   const text   = document.getElementById('utext').value.trim();
   const btn    = document.getElementById('sbtn');
 
-  // Validate required fields
-  let valid = true;
-  if (!name)   { document.getElementById('fw-name').classList.add('invalid');   valid = false; }
-  if (!worker) { document.getElementById('fw-worker').classList.add('invalid'); valid = false; }
-  if (!rating) { document.getElementById('fw-stars').classList.add('invalid');  valid = false; }
-  if (!valid) return;
+  if (!worker) {
+    document.getElementById('fw-worker').classList.add('invalid');
+    return;
+  }
 
   sending = true;
   btn.classList.add('loading');
   btn.innerHTML = '⏳ Yuborilmoqda...';
 
-  const stars_str = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
+  // Show success immediately — don't wait for Telegram
+  setTimeout(() => {
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('okScreen').style.display = 'block';
+  }, 400);
+
+  const stars_str = rating ? '⭐'.repeat(rating) + '☆'.repeat(5 - rating) : '—';
   const now = new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' });
 
   const message =
     `🌭 <b>Mr. Hotdog — Yangi Sharh!</b>\n\n` +
-    `👤 <b>Mijoz:</b> ${name}\n` +
+    (name   ? `👤 <b>Mijoz:</b> ${name}\n` : '') +
     `👨‍🍳 <b>Xodim:</b> ${worker}\n` +
-    `${stars_str} <b>(${rating}/5)</b>\n` +
-    (text ? `\n💬 <b>Fikr:</b>\n${text}\n` : '') +
+    (rating ? `${stars_str} <b>(${rating}/5)</b>\n` : '') +
+    (text   ? `\n💬 <b>Fikr:</b>\n${text}\n` : '') +
     `\n🕐 ${now}`;
 
   try {
     await sendToTelegram(message);
-
-    // Show success
-    document.getElementById('formBody').style.display = 'none';
-    document.getElementById('okScreen').style.display = 'block';
-
-    // Show result card
-    const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-    const rc = document.getElementById('resultCard');
-    document.getElementById('rcStars').innerHTML = Array.from({length:5}, (_,i) =>
-      `<span style="color:${i<rating?'#EF9F27':'rgba(239,159,39,0.2)'};font-size:1.1rem">★</span>`
-    ).join('');
-    document.getElementById('rcText').textContent = text ? `"${text}"` : `Xodim: ${worker}`;
-    document.getElementById('rcAv').textContent   = initials;
-    document.getElementById('rcName').textContent = name;
-    rc.style.display = 'block';
-
   } catch (e) {
-    // On real error only — not triggered falsely
-    sending = false;
-    btn.classList.remove('loading');
-    btn.innerHTML = '🌭 YUBORISH';
-    alert("Yuborishda xatolik yuz berdi. Internet aloqasini tekshiring.");
-    console.error(e);
+    console.error('Telegram xatosi:', e);
   }
 }
 </script>
