@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mr. Hotdog — Fikr qoldiring</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#1a0a00;font-family:'Inter',sans-serif;}
+
+.wrap {
+  background: #1a0a00;
+  padding: 52px 24px 48px;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.wrap::before {
+  content:'';
+  position:absolute;
+  top:-100px;left:50%;
+  transform:translateX(-50%);
+  width:500px;height:260px;
+  background:radial-gradient(ellipse,rgba(239,159,39,0.16) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.brand {
+  text-align:center;
+  margin-bottom:36px;
+}
+.brand-name {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3rem;
+  letter-spacing:5px;
+  color:#EF9F27;
+  line-height:1;
+}
+.brand-name span { color:#D85A30; }
+.brand-tag {
+  font-size:0.68rem;
+  letter-spacing:5px;
+  color:rgba(239,159,39,0.4);
+  text-transform:uppercase;
+  margin-top:6px;
+}
+
+.card3d {
+  background:linear-gradient(145deg,#2b1400,#1e0d00);
+  border:1px solid rgba(239,159,39,0.28);
+  border-radius:20px;
+  padding:36px 32px;
+  max-width:560px;
+  margin:0 auto;
+  transform:perspective(900px) rotateX(2deg);
+  transition:transform 0.4s;
+  box-shadow:0 24px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(239,159,39,0.1);
+}
+.card3d:hover { transform:perspective(900px) rotateX(0deg); }
+
+.form-head {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:28px;
+}
+.head-icon {
+  width:52px;height:52px;
+  background:#D85A30;
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;
+  transform:rotate(-8deg);
+  flex-shrink:0;
+  box-shadow:4px 5px 0 #7a2510;
+}
+.head-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.9rem;
+  color:#EF9F27;
+  letter-spacing:1px;
+  line-height:1;
+}
+.head-sub { font-size:0.8rem; color:rgba(255,255,255,0.38); margin-top:5px; }
+
+.flabel {
+  font-size:0.7rem;
+  font-weight:700;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:rgba(239,159,39,0.65);
+  display:block;
+  margin-bottom:7px;
+}
+.finput, .ftextarea {
+  width:100%;
+  box-sizing:border-box;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(239,159,39,0.18);
+  border-radius:10px;
+  padding:13px 15px;
+  color:#fff;
+  font-size:0.92rem;
+  font-family:'Inter',sans-serif;
+  outline:none;
+  transition:border-color 0.2s,background 0.2s;
+  margin-bottom:18px;
+}
+.finput::placeholder,.ftextarea::placeholder { color:rgba(255,255,255,0.18); }
+.finput:focus,.ftextarea:focus {
+  border-color:rgba(239,159,39,0.55);
+  background:rgba(239,159,39,0.05);
+}
+.ftextarea { resize:vertical; min-height:110px; line-height:1.55; }
+
+.star-row { display:flex; gap:10px; margin-bottom:22px; }
+.sstar {
+  font-size:1.9rem;
+  cursor:pointer;
+  color:rgba(239,159,39,0.2);
+  background:none;border:none;padding:0;
+  transition:color 0.15s,transform 0.15s;
+  line-height:1;
+}
+.sstar:hover,.sstar.lit { color:#EF9F27; transform:scale(1.18); }
+
+.sbtn {
+  width:100%;
+  background:#D85A30;
+  border:none;
+  border-radius:12px;
+  padding:17px;
+  color:#fff;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.45rem;
+  letter-spacing:2px;
+  cursor:pointer;
+  transition:background 0.2s,transform 0.15s;
+  box-shadow:0 6px 0 #7a2510, 0 10px 24px rgba(0,0,0,0.45);
+}
+.sbtn:hover { background:#c04a22; transform:translateY(-2px); }
+.sbtn:active { transform:translateY(3px); box-shadow:0 2px 0 #7a2510; }
+.sbtn.err { background:#A32D2D; }
+
+.result-card {
+  background:linear-gradient(145deg,#2b1400,#1e0d00);
+  border:1px solid rgba(239,159,39,0.38);
+  border-radius:16px;
+  padding:22px 24px;
+  max-width:560px;
+  margin:20px auto 0;
+  display:none;
+  animation:appear 0.45s ease;
+}
+@keyframes appear {
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.rc-text {
+  font-size:0.92rem;
+  color:rgba(255,255,255,0.78);
+  font-style:italic;
+  line-height:1.65;
+  margin-bottom:14px;
+}
+.rc-user { display:flex;align-items:center;gap:10px; }
+.rc-av {
+  width:38px;height:38px;border-radius:50%;
+  background:#D85A30;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:13px;color:#fff;
+  flex-shrink:0;
+}
+.rc-name { font-size:0.88rem;font-weight:600;color:#fff; }
+.rc-badge {
+  display:inline-block;
+  background:rgba(239,159,39,0.12);
+  border:1px solid rgba(239,159,39,0.3);
+  color:#EF9F27;
+  font-size:0.65rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  padding:2px 9px;border-radius:4px;margin-top:6px;
+}
+
+.ok-screen { display:none; text-align:center; padding:16px 0 8px; }
+.ok-screen .big { font-size:2.6rem; margin-bottom:10px; display:block; }
+.ok-screen h3 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.1rem;color:#EF9F27;margin-bottom:8px;
+}
+.ok-screen p { color:rgba(255,255,255,0.45);font-size:0.88rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-name">MR.<span>HOTDOG</span></div>
+    <div class="brand-tag">Toshkent &bull; Since 2016</div>
+  </div>
+
+  <div class="card3d" id="mainCard">
+    <div class="form-head">
+      <div class="head-icon">🌭</div>
+      <div>
+        <div class="head-title">Fikringizni qoldiring</div>
+        <div class="head-sub">Sizning ovozingiz bizga kuch beradi</div>
+      </div>
+    </div>
+
+    <div id="formBody">
+      <label class="flabel">Ismingiz</label>
+      <input class="finput" id="uname" placeholder="Masalan: Sardor" maxlength="40">
+
+      <label class="flabel">Baho bering</label>
+      <div class="star-row" id="starRow">
+        <button class="sstar" data-v="1">★</button>
+        <button class="sstar" data-v="2">★</button>
+        <button class="sstar" data-v="3">★</button>
+        <button class="sstar" data-v="4">★</button>
+        <button class="sstar" data-v="5">★</button>
+      </div>
+
+      <label class="flabel">Fikringiz</label>
+      <textarea class="ftextarea" id="utext" placeholder="Hot dog mazasi, xizmat yoki yetkazish haqida yozing..."></textarea>
+
+      <button class="sbtn" id="sbtn" onclick="send()">🌭 YUBORISH</button>
+    </div>
+
+    <div class="ok-screen" id="okScreen">
+      <span class="big">🎉</span>
+      <h3>Rahmat!</h3>
+      <p>Fikringiz qabul qilindi. Mr. Hotdog sizi hurmat qiladi!</p>
+    </div>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="rc-stars" id="rcStars"></div>
+    <div class="rc-text" id="rcText"></div>
+    <div class="rc-user">
+      <div class="rc-av" id="rcAv"></div>
+      <div>
+        <div class="rc-name" id="rcName"></div>
+        <div class="rc-badge">Yangi sharh</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let rating = 0;
+const stars = document.querySelectorAll('.sstar');
+stars.forEach(s => {
+  s.addEventListener('mouseenter', () => {
+    stars.forEach(b => b.classList.toggle('lit', +b.dataset.v <= +s.dataset.v));
+  });
+  s.addEventListener('mouseleave', () => {
+    stars.forEach(b => b.classList.toggle('lit', +b.dataset.v <= rating));
+  });
+  s.addEventListener('click', () => {
+    rating = +s.dataset.v;
+    stars.forEach(b => b.classList.toggle('lit', +b.dataset.v <= rating));
+  });
+});
+
+function send() {
+  const name = document.getElementById('uname').value.trim();
+  const text = document.getElementById('utext').value.trim();
+  const btn = document.getElementById('sbtn');
+
+  if (!name || rating === 0 || !text) {
+    btn.classList.add('err');
+    btn.textContent = "⚠ Barcha maydonlarni to'ldiring!";
+    setTimeout(() => { btn.classList.remove('err'); btn.innerHTML = '🌭 YUBORISH'; }, 2200);
+    return;
+  }
+
+  document.getElementById('formBody').style.display = 'none';
+  document.getElementById('okScreen').style.display = 'block';
+
+  const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+
+  const rc = document.getElementById('resultCard');
+  document.getElementById('rcStars').innerHTML = Array.from({length:5},(_,i)=>
+    `<span style="color:${i<rating?'#EF9F27':'rgba(239,159,39,0.2)'};font-size:1.1rem">★</span>`
+  ).join('');
+  document.getElementById('rcText').textContent = '"' + text + '"';
+  document.getElementById('rcAv').textContent = initials;
+  document.getElementById('rcName').textContent = name;
+  rc.style.display = 'block';
+}
+</script>
+</body>
+</html>
