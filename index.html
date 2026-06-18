@@ -246,7 +246,7 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
     <div class="form-head">
       <div class="head-icon">🌭</div>
       <div>
-        <div class="head-title">Fikringizni qoldiring</div>
+        <label class="flabel">Fikringiz <span class="req">*</span></label>
         <div class="head-sub">Sizning ovozingiz bizga kuch beradi</div>
       </div>
     </div>
@@ -283,10 +283,17 @@ body{background:#1a0a00;font-family:'Inter',sans-serif;}
         </div>
       </div>
 
-      <div class="field-wrap" id="fw-text">
-        <label class="flabel">Fikringiz</label>
-        <textarea class="ftextarea" id="utext" placeholder="Hot dog mazasi, xizmat yoki yetkazish haqida yozing..."></textarea>
-      </div>
+     <div class="field-wrap" id="fw-text">
+  <label class="flabel">Fikringiz <span class="req">*</span></label>
+
+  <textarea
+      class="ftextarea"
+      id="utext"
+      placeholder="Hot dog mazasi, xizmat yoki yetkazish haqida yozing..."
+      oninput="clearErr('fw-text')"></textarea>
+
+  <div class="err-msg">Fikr yozish majburiy</div>
+</div>
 
       <button class="sbtn" id="sbtn" onclick="send()">🌭 YUBORISH</button>
     </div>
@@ -376,6 +383,10 @@ async function send() {
     document.getElementById('fw-worker').classList.add('invalid');
     return;
   }
+  if (!text) {
+  document.getElementById('fw-text').classList.add('invalid');
+  return;
+}
 
   sending = true;
   btn.classList.add('loading');
